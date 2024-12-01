@@ -1,21 +1,26 @@
 "use strict";
+const { getUserIdByName, getGroupIdByName } = require("../utils/dbSeedHelper");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const johnId = await getUserIdByName("John Doe");
+    const janeId = await getUserIdByName("Jane Smith");
+    const groupId = await getGroupIdByName("Weekend Getaway");
+
     await queryInterface.bulkInsert(
       "GroupUsers",
       [
         {
-          userId: 1,
-          groupId: 1,
+          userId: johnId,
+          groupId: groupId,
           role: "admin",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          userId: 2,
-          groupId: 1,
+          userId: janeId,
+          groupId: groupId,
           role: "member",
           createdAt: new Date(),
           updatedAt: new Date(),

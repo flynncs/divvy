@@ -1,16 +1,20 @@
 "use strict";
+const { getUserIdByName, getGroupIdByName } = require("../utils/dbSeedHelper");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    const johnId = await getUserIdByName("John Doe");
+    const groupId = await getGroupIdByName("Weekend Getaway");
+
     await queryInterface.bulkInsert(
       "Receipts",
       [
         {
           name: "Cool Receipt",
           date: new Date(),
-          groupId: 1,
-          createdBy: 1,
+          groupId: groupId,
+          createdBy: johnId,
           totalAmount: 100.0,
           pictureUrl: "https://picsum.photos/200",
           createdAt: new Date(),
@@ -22,11 +26,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    await queryInterface.bulkDelete("Receipts", null, {});
   },
 };

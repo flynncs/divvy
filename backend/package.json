@@ -8,7 +8,8 @@
     "migrate:dev": "npx sequelize-cli db:migrate --env development",
     "migrate:test": "npx sequelize-cli db:migrate --env test",
     "reset:dev": "npx sequelize-cli db:drop --env development && npx sequelize-cli db:create --env development && npm run migrate:dev",
-    "reset:test": "npx sequelize-cli db:drop --env test && npx sequelize-cli db:create --env test && npm run migrate:test"
+    "reset:test": "npx sequelize-cli db:drop --env test && npx sequelize-cli db:create --env test && npm run migrate:test",
+    "seed:dev": "npx sequelize-cli db:seed:undo:all && npx sequelize-cli db:seed:all"
   },
   "keywords": [],
   "author": "",
