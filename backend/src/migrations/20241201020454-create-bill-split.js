@@ -25,6 +25,7 @@ module.exports = {
           model: "Users",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       itemId: {
         type: Sequelize.INTEGER,
@@ -32,6 +33,7 @@ module.exports = {
           model: "Items",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       receiptId: {
         type: Sequelize.INTEGER,
@@ -39,6 +41,7 @@ module.exports = {
           model: "Receipts",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

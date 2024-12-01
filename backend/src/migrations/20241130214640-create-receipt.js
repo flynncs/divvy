@@ -28,6 +28,7 @@ module.exports = {
           model: "Groups",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdBy: {
         type: Sequelize.INTEGER,
@@ -36,6 +37,7 @@ module.exports = {
           model: "Users",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       pictureUrl: {
         type: Sequelize.STRING,

@@ -19,14 +19,17 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Item, {
         foreignKey: "createdBy",
         as: "items",
+        onDelete: "CASCADE",
       });
       User.hasMany(models.Receipt, {
         foreignKey: "createdBy",
         as: "receipts",
+        onDelete: "CASCADE",
       });
       User.hasMany(models.BillSplit, {
         foreignKey: "userId",
         as: "billSplits",
+        onDelete: "CASCADE",
       });
     }
   }

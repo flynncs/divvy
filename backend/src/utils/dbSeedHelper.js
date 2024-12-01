@@ -1,4 +1,4 @@
-const { User, Group, Receipt } = require("../models");
+const { User, Group, Receipt, Item } = require("../models");
 
 const getUserIdByName = async (name) => {
   const user = await User.findOne({ where: { name } });
@@ -15,8 +15,14 @@ const getReceiptIdByName = async (name) => {
   return receipt.id;
 };
 
+const getItemIdByName = async (name) => {
+  const item = await Item.findOne({ where: { name } });
+  return item.id;
+};
+
 module.exports = {
   getUserIdByName,
   getGroupIdByName,
   getReceiptIdByName,
+  getItemIdByName,
 };
