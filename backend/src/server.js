@@ -1,6 +1,9 @@
 require("dotenv").config();
 const express = require("express");
-const connectDb = require("./db"); // Import the db connection function
+const cors = require("cors");
+
+const authenticate = require("./middlewares/authenticate");
+const connectDb = require("./db");
 const models = require("./models");
 
 const app = express();
@@ -8,6 +11,8 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+app.use(cors());
+app.use(authenticate);
 
 // Sync models
 const syncModels = async () => {
