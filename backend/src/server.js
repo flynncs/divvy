@@ -5,6 +5,7 @@ const cors = require("cors");
 const authenticate = require("./middlewares/authenticate");
 const connectDb = require("./db");
 const models = require("./models");
+const receiptsRouter = require("./routes/receipts");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -42,5 +43,8 @@ const startServer = async () => {
 app.get("/", (req, res) => {
   res.send("Divvy Server");
 });
+
+// Receipts route
+app.use("/api/receipts", receiptsRouter); // Mount the routes
 
 startServer();

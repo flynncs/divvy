@@ -60,6 +60,14 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+      url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      analysis: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
     },
     {
       sequelize,
