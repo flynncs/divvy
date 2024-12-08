@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const authenticate = require("./middlewares/authenticate");
+const errorHandler = require("./middlewares/errorHandler");
 const connectDb = require("./db");
 const models = require("./models");
 const receiptsRouter = require("./routes/receipts");
@@ -14,6 +15,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 app.use(authenticate);
+app.use(errorHandler);
 
 // Sync models
 const syncModels = async () => {

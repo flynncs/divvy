@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       totalAmount: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
       },
       groupId: {
         type: DataTypes.INTEGER,

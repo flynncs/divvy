@@ -1,87 +1,55 @@
 const multer = require("multer");
 
-const { Receipt } = require("../models");
-const { admin } = require("../config/firebase");
 const { analyzeReceipt } = require("../services/azureReceiptAnalysis");
+const {
+  uploadToFirebaseStorage,
+} = require("../services/firebaseStorageService");
+const { createReceipt } = require("../services/receiptService");
+const {
+  extractReceiptName,
+  extractReceiptTotal,
+  extractReceiptDate,
+} = require("../utils/analysisUtils");
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+});
 
-const generateSignedUrl = async (filePath) => {
+const uploadReceipt = async (req, res, next) => {
   try {
-    const bucket = admin.storage().bucket();
-    const file = bucket.file(filePath);
+    if (!req.file) {
+      throw new Error("No file uploaded");
+    }
 
-    const [url] = await file.getSignedUrl({
-      action: "read",
-      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-    });
-
-    return url;
-  } catch (error) {
-    console.log("Error generating signed URL:", error);
-    throw new Error("Failed to generate signed URL");
-  }
-};
-
-const uploadReceipt = async (req, res) => {
-  console.log("Uploading receipt...");
-
-  try {
     const userId = req.user.id;
     const file = req.file;
 
-    // Ensure the file is present
-    if (!file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    const { filePath, publicUrl } = await uploadToFirebaseStorage(file, userId);
 
-    // Generate a unique filename with userId and timestamp to avoid overwriting
-    const fileName = `${Date.now()}-${file.originalname}`;
-    const filePath = `receipts/${userId}/${fileName}`;
+    const analysis = await analyzeReceipt(publicUrl);
 
-    // Upload the file to Firebase Storage
-    const bucket = admin.storage().bucket();
-    const fileUpload = bucket.file(filePath);
-    const fileStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype, // Set the file type (mimetype)
-      },
-    });
+    const receiptName = extractReceiptName(analysis);
+    const receiptTotal = extractReceiptTotal(analysis);
+    const receiptDate = extractReceiptDate(analysis);
 
-    // Upload process
-    fileStream.on("error", (error) => {
-      console.log("Error uploading file:", error);
-      return res.status(500).json({ message: "Error uploading file", error });
-    });
+    const receiptData = {
+      name: receiptName,
+      total: receiptTotal,
+      date: receiptDate,
+      url: publicUrl,
+      createdBy: userId,
+      groupId: req.body.groupId || null,
+      analysis: analysis,
+    };
 
-    fileStream.on("finish", async () => {
-      // Generate a public URL for the uploaded file
-      const publicUrl = await generateSignedUrl(filePath);
+    // TODO: Save receipt to database
+    //const receipt = await createReceipt(receiptData);
 
-      // Call the Azure receipt analysis service
-      const analysis = await analyzeReceipt(publicUrl);
-
-      // Here, you can also save the receipt and analysis in your database
-      // const receipt = new Receipt({
-      //   userId,
-      //   fileUrl: publicUrl,
-      //   analysis: analysis,
-      // });
-      // await receipt.save();
-
-      // Respond with the file URL and analysis
-      res.status(201).json({
-        message: "File uploaded and analyzed successfully",
-        url: publicUrl,
-        analysis,
-      });
-    });
-
-    // Start uploading the file buffer to Firebase Storage
-    fileStream.end(file.buffer);
+    res.status(201).json({ receiptData });
   } catch (error) {
-    console.log("Error during receipt upload:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    console.error("Error uploading receipt:", error);
+    next(error);
   }
 };
 
