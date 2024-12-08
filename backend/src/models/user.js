@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
       },
       firebaseId: {
@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
-      profilePictureUrl: {
+      profilePicture: {
         type: DataTypes.STRING,
         allowNull: true,
       },

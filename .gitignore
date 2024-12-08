@@ -16,3 +16,7 @@ backend/.env
 .idea/
 .DS_Store
 Thumbs.db
+backend/src/config/firebase-service-account.json
+
+# Token utils
+backend/src/config/getFirebaseIdToken.js

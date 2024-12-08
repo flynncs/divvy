@@ -1,13 +1,21 @@
 require("dotenv").config();
 const express = require("express");
-const connectDb = require("./db"); // Import the db connection function
+const cors = require("cors");
+
+const authenticate = require("./middlewares/authenticate");
+const errorHandler = require("./middlewares/errorHandler");
+const connectDb = require("./db");
 const models = require("./models");
+const receiptsRouter = require("./routes/receipts");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+app.use(cors());
+app.use(authenticate);
+app.use(errorHandler);
 
 // Sync models
 const syncModels = async () => {
@@ -37,5 +45,8 @@ const startServer = async () => {
 app.get("/", (req, res) => {
   res.send("Divvy Server");
 });
+
+// Receipts route
+app.use("/api/receipts", receiptsRouter); // Mount the routes
 
 startServer();

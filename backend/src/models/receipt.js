@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       totalAmount: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
       },
       groupId: {
         type: DataTypes.INTEGER,
@@ -59,6 +59,14 @@ module.exports = (sequelize, DataTypes) => {
           model: "Users",
           key: "id",
         },
+      },
+      url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      analysis: {
+        type: DataTypes.JSON,
+        allowNull: true,
       },
     },
     {
