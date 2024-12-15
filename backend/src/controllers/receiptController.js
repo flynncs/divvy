@@ -45,4 +45,19 @@ const uploadReceipt = async (req, res, next) => {
   }
 };
 
-module.exports = { upload, uploadReceipt };
+const createManualReceipt = async (req, res, next) => {
+  console.log("req.body", req.body);
+  try {
+    const receiptData = {
+      ...req.body.receipt,
+      createdBy: req.user.id,
+    };
+
+    const receipt = await createReceipt(receiptData);
+    res.status(201).json({ receipt });
+  } catch (error) {
+    next(createInternalError("Error creating receipt"));
+  }
+};
+
+module.exports = { upload, uploadReceipt, createManualReceipt };

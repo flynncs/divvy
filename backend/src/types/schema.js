@@ -18,7 +18,7 @@ const analysisReceiptSchema = z.object({
 // Schema for validating receipt data before database insertion
 const createReceiptSchema = z.object({
   name: z.string().min(1, "Receipt name is required"),
-  date: z.date(),
+  date: z.coerce.date(),
   totalAmount: z.number().nonnegative(),
   groupId: z.number().int().positive().nullable().optional(),
   createdBy: z.number().int().positive(),
@@ -31,7 +31,7 @@ const createReceiptSchema = z.object({
 const createItemSchema = z.object({
   name: z.string().min(1, "Item name is required"),
   amount: z.number(),
-  date: z.date(),
+  date: z.coerce.date(),
   groupId: z.number().int().positive().nullable().optional(),
   createdBy: z.number().int().positive(),
   receiptId: z.number().int().positive(),

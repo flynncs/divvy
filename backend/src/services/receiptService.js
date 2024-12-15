@@ -28,17 +28,19 @@ const createReceipt = async (receiptData) => {
         createdBy: receipt.createdBy,
       }));
 
-      const validatedItems = createItemsSchema.safeParse(itemsData);
-      if (!validatedItems.success) {
-        console.error("Validation errors:", validatedItems.error);
+      const validatedData = createItemsSchema.safeParse(itemsData);
+      console.log("validatedItems", validatedData);
+      if (!validatedData.success) {
+        console.error("Validation errors:", validatedData.error);
         throw new Error(
-          `Items validation failed: ${validatedItems.error.errors
+          `Items validation failed: ${validatedData.error.errors
             .map((e) => e.message)
             .join(", ")}. Items: ${JSON.stringify(itemsData)}`
         );
       }
 
-      const items = await Item.bulkCreate(validatedItems);
+      const items = await Item.bulkCreate(validatedData.data);
+      console.log("items", items);
       await receipt.addItems(items);
     }
 
