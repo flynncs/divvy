@@ -1,36 +1,60 @@
-const { admin } = require("../config/firebase");
+const { getStorage } = require("firebase-admin/storage");
+
 const {
   generateSignedFirebaseUrl,
 } = require("../utils/generateFirebaseSignedUrl");
 
 const uploadToFirebaseStorage = async (file, userId) => {
-  const fileName = `${Date.now()}-${file.originalname}`;
-  const filePath = `receipts/${userId}/${fileName}`;
-  const bucket = admin.storage().bucket();
+  if (!file?.buffer || !userId) {
+    throw new Error("Invalid file or userId");
+  }
+
+  const storage = getStorage();
+  const bucket = storage.bucket();
+  const timestamp = Date.now();
+  const safeFileName = encodeURIComponent(
+    file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_")
+  );
+  const filePath = `receipts/${userId}/${timestamp}-${safeFileName}`;
+  const fileRef = bucket.file(filePath);
 
   return new Promise((resolve, reject) => {
-    const fileUpload = bucket.file(filePath);
-    const fileStream = fileUpload.createWriteStream({
+    const stream = fileRef.createWriteStream({
+      contentType: file.mimetype,
       metadata: {
-        contentType: file.mimetype,
+        userId,
+        uploadedAt: timestamp,
+        originalName: file.originalname,
       },
+      validation: "crc32c",
     });
 
-    fileStream.on("error", (error) => reject(error));
+    stream.on("error", (error) => {
+      reject(new Error(`Upload failed: ${error.message}`));
+    });
 
-    fileStream.on("finish", async () => {
+    stream.on("finish", async () => {
       try {
-        const publicUrl = await generateSignedFirebaseUrl(filePath);
-        resolve({ filePath, publicUrl });
-      } catch (urlError) {
-        reject(urlError);
+        const previewUrl = `https://firebasestorage.googleapis.com/v0/b/${
+          bucket.name
+        }/o/${encodeURIComponent(filePath)}?alt=media`;
+        const downloadUrl = await generateSignedFirebaseUrl(
+          filePath,
+          365 * 24 * 60 * 60 * 1000
+        );
+
+        resolve({
+          filePath,
+          previewUrl,
+          downloadUrl,
+        });
+      } catch (error) {
+        reject(new Error(`Failed to generate URLs: ${error.message}`));
       }
     });
 
-    fileStream.end(file.buffer);
+    stream.end(file.buffer);
   });
 };
 
-module.exports = {
-  uploadToFirebaseStorage,
-};
+module.exports = { uploadToFirebaseStorage };

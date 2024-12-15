@@ -1,13 +1,13 @@
 const { admin } = require("../config/firebase");
 
-const generateSignedFirebaseUrl = async (filePath) => {
+const generateSignedFirebaseUrl = async (filePath, expireTime) => {
   try {
     const bucket = admin.storage().bucket();
     const file = bucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
+      expires: Date.now() + expireTime,
     });
 
     return url;

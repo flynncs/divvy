@@ -1,21 +1,23 @@
-const extractReceiptName = (analysis) => {
-  const transactionDate = analysis.fields.TransactionDate.valueDate;
-  const merchantName = analysis.fields.MerchantName.content;
+const { analysisReceiptSchema } = require("../types/schema");
 
-  return `${transactionDate}-${merchantName}`;
+const extractReceiptData = (analysis) => {
+  const { fields } = analysis;
+
+  const receiptData = {
+    name: fields?.MerchantName?.valueString || "Unknown Merchant",
+    date: fields?.TransactionDate?.valueDate
+      ? new Date(fields.TransactionDate.valueDate)
+      : new Date(),
+    totalAmount: parseFloat(fields?.Total?.valueCurrency?.amount) || 0.0,
+    items: fields?.Items?.valueArray?.map((item) => ({
+      name: item?.valueObject?.Description?.valueString || "Unknown Item",
+      amount:
+        parseFloat(item?.valueObject?.TotalPrice?.valueCurrency?.amount) || 0.0,
+    })),
+  };
+
+  return analysisReceiptSchema.parse(receiptData);
 };
-
-const extractReceiptTotal = (analysis) => {
-  return analysis.fields.Total.valueCurrency.amount;
-};
-
-const extractReceiptDate = (analysis) => {
-  const transactionDate = analysis.fields.TransactionDate.valueDate;
-  return new Date(transactionDate);
-};
-
 module.exports = {
-  extractReceiptName,
-  extractReceiptTotal,
-  extractReceiptDate,
+  extractReceiptData,
 };

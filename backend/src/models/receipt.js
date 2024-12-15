@@ -60,8 +60,12 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      url: {
-        type: DataTypes.STRING,
+      downloadUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      previewUrl: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       analysis: {
